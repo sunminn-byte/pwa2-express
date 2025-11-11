@@ -1,0 +1,15 @@
+import { validationResult } from "express-validator";
+
+export default function validatorHandler(request, response, next) {
+  // validationResult(request) : request에 담긴 유효성 검사 결과 중,
+  // 에러를 모아서 배열로 반환 (에러 없으면 빈 배열 반환)
+  const errors = validationResult(request);
+
+  if(!errors.isEmpty()) {
+    // formatWith : array의 map처럼 동작 함
+    const customErrors = errors.formatWith(error => `${error.path}: ${error.msg}`);
+    return response.status(400).send(customErrors.array());
+  }
+
+  next();
+}
