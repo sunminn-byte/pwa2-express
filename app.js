@@ -1,9 +1,11 @@
-import express, { response } from 'express'; // express 모듈 가져오기
+import express from 'express'; // express 모듈 가져오기
 import authRouter from './routes/auth.router.js';
 import usersRouter from './routes/users.router.js';
+import { eduTest, eduUsersTest } from './app/middlewares/edu/edu.middleware.js';
 
 const app = express();
 app.use(express.json()); // JSON으로 요청이 올 경우 파싱 처리(미들웨어)
+app.use(eduTest); // 커스텀 미들웨어 전역 등록
 
 // app.get(); : http method가 get인거만 가져옴
 // request : 유저가 보내온 모든 parameter들이 담김(요청)
@@ -83,8 +85,9 @@ app.post('/api/posts', (request, response, next) => {
 // ---------------------------------------------
 // 라우트를 모듈로 나누고 그룹핑하여 관리
 // 대체 라우트보다 위에 있어야 함.(대체 라우트는 가장 아래에 위치 필수)
+// usersRouter 에만 eduUsersTest 미들웨어 적용
 app.use('/api', authRouter);
-app.use('/api/users', usersRouter);
+app.use('/api/users', eduUsersTest, usersRouter);
 
 
 // ---------------------------------------------
