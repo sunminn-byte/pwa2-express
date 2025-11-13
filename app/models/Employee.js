@@ -124,7 +124,7 @@ const options = {
   timestamps: true, // createdAt, updatedAt 자동 관리 (컬럼명이 바뀌면 안됨)
   // createdAt: 'empCreatedAt', // 컬럼명이 다르면 이렇게 추가 설정해줘야 함
   // updatedAt: false, // timestamps에서 말고 따로 관리가 필요할 때
-  paranoid: true, // Soft Delete 설정 (deletedAt 자동 관리)
+  paranoid: true, // Soft Delete 설정 (deletedAt 자동 관리), false면 물리적 삭제 가능
 }
 
 // 모델 객체 작성
