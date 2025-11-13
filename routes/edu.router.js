@@ -1,6 +1,6 @@
 import express from 'express';
 import db from '../app/models/index.js';
-import { Op, Sequelize } from 'sequelize';
+import { Op } from 'sequelize';
 import dayjs from 'dayjs';
 const { sequelize, Employee } = db;
 
@@ -23,7 +23,7 @@ eduRouter.get('/api/edu', async (request, response, next) => {
     //   sql,
     //   {
     //     replacements: [fireDate], // ?가 여러개면 ? 순서대로 적어줘야 함
-    //     type: Sequelize.QueryTypes.SELECT, // 평문일때 type 필수
+    //     type: sequelize.QueryTypes.SELECT, // 평문일때 type 필수
     //   }
     // );
 
@@ -90,10 +90,10 @@ eduRouter.get('/api/edu', async (request, response, next) => {
     //   }
     //   ,{
     //     where: {
-    //       // empId: 100008
-    //       empId: {
-    //         [Op.gte]: 100007
-    //       }
+    //       empId: 100006
+    //       // empId: {
+    //       //   [Op.gte]: 100007
+    //       // }
     //     }
     //   }
     // );
@@ -116,6 +116,7 @@ eduRouter.get('/api/edu', async (request, response, next) => {
     // employee.hireAt = dayjs().format('YYYY-MM-DD');
     // result = await employee.save();
 
+    // -----------------------
     // destroy(options) : 조건에 맞는 레코드 삭제 후 영향받은 레코드 수를 반환
     // deleted_at 에 값이 들어감 (soft delete 설정 때문에)
     // result = await Employee.destroy({
@@ -126,8 +127,97 @@ eduRouter.get('/api/edu', async (request, response, next) => {
     //   // force: true // 모델에 `paranoid: true`일 경우에 물리적 삭제를 위한 옵션
     // });
 
+    // -----------------------
+    // restore(options) : Soft Delete 된 레코드를 복원
+    // result = await Employee.restore({
+    //   where: {
+    //     empId: 100009
+    //   }
+    // });
 
+    // where 옵션 : 조건 지정 (AND)
+    // 이름이 '강가람'이고, 성별이 여자인 사원 정보 조회
+    // result = await Employee.findAll({
+    //   attributes: ['empId', 'name', 'gender'],
+    //   where: {
+    //     name: '강가람',
+    //     gender: 'F',
+    //     // [Op.and]: [
+    //     //   { name: '강가람' },
+    //     //   { name: '신서연' }
+    //     // ],
+    //   }
+    // });
 
+    // where 옵션 : 조건 지정 (OR)
+    // 이름이 '강가람' 또는 '신서연'인 사원 조회
+    // result = await Employee.findAll({
+    //   attributes: ['empId', 'name', 'gender'],
+    //   where: {
+    //     [Op.or]: [
+    //       { name: '강가람' },
+    //       { name: '신서연' }
+    //     ],
+    //   }
+    // });
+
+    // where 옵션 : 조건 지정 (AND와 OR 동시 사용)
+    // 성별이 여자이고, 이름이 '강가람' 또는 '신서연'인 사원 조회
+    // result = await Employee.findAll({
+    //   attributes: ['empId', 'name', 'gender'],
+    //   where: {
+    //     gender: 'F',
+    //     [Op.or]: [
+    //       { name: '강가람' },
+    //       { name: '신서연' },
+    //     ]
+    //   }
+    // });
+
+    // result = await Employee.findAll({
+    //   where: {
+    //     // empId: {
+    //     //   // [Op.between]: [1, 100] // 1~100
+    //     //   // [Op.notBetween]: [1, 100] // 1~100을 제외한 전체
+    //     //   [Op.in]: [1, 2, 3] // 1,2,3
+    //     //   // [Op.notIn]: [1, 2, 3] // 1,2,3을 제외한 전체
+    //     // },
+    //     name: {
+    //       [Op.like]: '%가람'
+    //       // [Op.iLike]: '%가람' // 대소문자 무시
+    //     },
+    //     fireAt: {
+    //       // null 조건
+    //       [Op.is]: null
+    //       // [Op.not]: null
+    //     }
+    //   }
+    // });
+
+    // orderby, limit(offset)
+    // result = await Employee.findAll({
+    //   where: {
+    //     empId: {
+    //       [Op.gte]: 10000
+    //     }
+    //   },
+    //   order: [
+    //     ['name', 'ASC'],
+    //     ['birth', 'DESC'],
+    //   ],
+    //   limit: 10,
+    //   offset: 10,
+    // });
+
+    // groupby, having
+    result = await Employee.findAll({
+      attributes: [
+        'gender',
+        [sequelize.fn('COUNT', sequelize.col('*')), 'cnt_gender']
+      ],
+      group: ['gender'],
+      having: sequelize.literal('cnt_gender >= 40000'),
+    });
 
 
 
