@@ -125,7 +125,7 @@ const options = {
   // createdAt: 'empCreatedAt', // 컬럼명이 다르면 이렇게 추가 설정해줘야 함
   // updatedAt: false, // timestamps에서 말고 따로 관리가 필요할 때
   paranoid: true, // Soft Delete 설정 (deletedAt 자동 관리), false면 물리적 삭제 가능
-}
+};
 
 // 모델 객체 작성
 const Employee = {
@@ -136,6 +136,12 @@ const Employee = {
 
     return defineEmployee;
   },
+  // 모델 관계를 정의
+  // associate해야 JOIN 가능
+  associate: (db) => {
+    // 1:n 관계에서 부모 모델에 설정하는 방법 (1명의 사원은 복수의 직급 정보를 가진다.)
+    db.Employee.hasMany(db.TitleEmp, { sourceKey: 'empId', foreignKey: 'empId', as: 'titleEmps' });
+  }
 };
 
 export default Employee;

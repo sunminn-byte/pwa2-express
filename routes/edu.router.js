@@ -2,7 +2,7 @@ import express from 'express';
 import db from '../app/models/index.js';
 import { Op } from 'sequelize';
 import dayjs from 'dayjs';
-const { sequelize, Employee } = db;
+const { sequelize, Employee, TitleEmp, Title } = db;
 
 const eduRouter = express.Router();
 
@@ -90,7 +90,7 @@ eduRouter.get('/api/edu', async (request, response, next) => {
     //   }
     //   ,{
     //     where: {
-    //       empId: 100006
+    //       empId: 100008
     //       // empId: {
     //       //   [Op.gte]: 100007
     //       // }
@@ -210,13 +210,43 @@ eduRouter.get('/api/edu', async (request, response, next) => {
     // });
 
     // groupby, having
-    result = await Employee.findAll({
-      attributes: [
-        'gender',
-        [sequelize.fn('COUNT', sequelize.col('*')), 'cnt_gender']
+    // result = await Employee.findAll({
+    //   attributes: [
+    //     'gender',
+    //     [sequelize.fn('COUNT', sequelize.col('*')), 'cnt_gender']
+    //   ],
+    //   group: ['gender'],
+    //   having: sequelize.literal('cnt_gender >= 40000'),
+    // });
+
+    // join
+    result = await Employee.findOne({ // 나: Employee
+      attributes: ['empId', 'name'], // Employee의 출력할 컬럼 작성 위치
+      where: { // Employee의 조건 작성 위치
+        empId: 1
+      },
+      include: [
+        {
+          model: TitleEmp, // 내가 연결할 모델
+          as: 'titleEmps', // 내가 사용할 관계의 별칭
+          required: true, // `true`면 Inner JOIN, `false`면 Left Outer JOIN
+          attributes: ['titleCode'], // TitleEmp의 출력할 컬럼 작성 위치
+          where: { // TitleEmp의 조건 작성 위치
+            endAt: {
+              [Op.is]: null,
+            }
+          },
+          include: [ // Employee가 아닌 TitleEmp와 JOIN됨
+            {
+              model: Title,
+              as: 'title',
+              // association: 'title', // model, as 대신 association만으로도 가능
+              required: true,
+              attributes: ['title'],
+            }
+          ]
+        }
       ],
-      group: ['gender'],
-      having: sequelize.literal('cnt_gender >= 40000'),
     });
 
 
